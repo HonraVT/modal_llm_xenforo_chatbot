@@ -3,6 +3,9 @@ USER_AGENT = ("Mozilla/5.0 (Windows NT 11.0; Win64) AppleWebKit/537.36 (KHTML, l
 
 LOGGING_ENABLED = True
 
+# Bot "memory" max user conversation history.
+MAX_HISTORY = 3
+
 # forum
 URL = "https://7349b2b02ea4a424.demo-xenforo.com/2213"
 # URL = "https://www.ignboards.com/forums/vale-tudo.80331"
