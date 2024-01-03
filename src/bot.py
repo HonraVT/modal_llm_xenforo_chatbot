@@ -16,7 +16,7 @@ def first_run(production=True):
 
 
 def main(production=True):
-    db = BotDB("syrah_db.json" if production else "test_db.json")
+    db = BotDB("bot_db.json" if production else "test_db.json")
     try:
         fs = ForumScraper(URL, COOKIE, production)
         bot_name = fs.my_name
