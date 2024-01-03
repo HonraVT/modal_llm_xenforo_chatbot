@@ -28,7 +28,7 @@ logger = configure_logging()
 def run():
     while True:
         print("run")
-        main(production=False)
+        main(production=True)
         sleep(10)
 
 
@@ -36,5 +36,5 @@ def run():
 # and prevent bot responding ALL old messages.
 # comment run() function at bottom before run first_run function.
 
-# first_run(production=False)
+# first_run(production=True)
 run()
