@@ -7,7 +7,7 @@
 ## Requirements
 
 - python 3.11
-- ```xf_user``` User's logged in browser cookies added to ```secret.py``` file
+- ```xf_user``` User's logged in browser cookies added to ```src/secret.py``` file
 
 
 <img alt="demo" src="https://i.imgur.com/zdBgMO3.png">
