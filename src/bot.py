@@ -3,7 +3,7 @@ from time import sleep
 from src.db_handler import BotDB
 from src.forum_scraper import ForumScraper
 from src.modal_cli import receive_data
-from src.secret import URL, COOKIE, LOGGING_ENABLED
+from src.secret import URL, COOKIE, LOGGING_ENABLED, MAX_HISTORY
 from src.utils import get_last_answered, is_newer_than_x_minutes, format_reply
 
 
@@ -45,7 +45,7 @@ def main(production=True):
 
                 if alert_type == "quoted" and \
                         is_newer_than_x_minutes(db_timestamp) and \
-                        len(history) <= 3:
+                        len(history) <= MAX_HISTORY:
                     # prepare response with history update history.
                     response = receive_data(p_format, history)
                     db.update_history(author, response, timestamp)
