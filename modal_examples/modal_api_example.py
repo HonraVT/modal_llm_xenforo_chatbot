@@ -1,17 +1,14 @@
-# first you need register on modal.com with your GitHub account.
-# steps:
-# Create a new virtual environment (separate from this project) with python 3.11.
-# install modal lib: pip install modal
-# Don't worry about errors in your IDE, the modal will run the code in the cloud.
-# Configure modal (get token authorization file): python -m modal setup
-# create a huggingface token at https://huggingface.co/settings/tokens to not be blocked at download weights.
-# now set a new "secrets" on modal dashboard -> secrets tab
-# select "custom" add key: HUGGINGFACE_TOKEN value: "your huggingface token" and add a name: my-huggingface-secret
-# create another secret on modal dashboard -> secrets tab:
-# select "custom" key: API_TOKEN value: "your random 16 length confidential password" and add a name: bot-secrets
-# After, run this file with: modal deploy modal_api_example.py
-# Wait modal internally installs and get your url endpoint printed on console :)
-# set this url in "MODAL_URL" in src.secret.py file.
+# Register on modal.com with your GitHub account. Follow these steps:
+# 1. Create a new virtual environment with Python 3.11.
+# 2. Install the Modal library: `pip install modal`.
+# 3. Ignore IDE errors; Modal will execute the code in the cloud.
+# 4. Configure Modal and obtain the token authorization file: `python -m modal setup`.
+# 5. Generate a Hugging Face token at https://huggingface.co/settings/tokens to avoid download issues.
+# 6. On the Modal dashboard's "Secrets" tab, create a new secret named "my-huggingface-secret" with key: `HUGGINGFACE_TOKEN` and value: "your Hugging Face token."
+# 7. Create another secret named "bot-secrets" with key: `API_TOKEN` and value: "your random 16-character confidential password."
+# 8. Run the file using: `modal deploy modal_api_example.py`.
+# 9. Wait for Modal to install and get your URL endpoint printed on the console.
+# 10. Set this URL as "MODAL_URL" in the `src.secret.py` file.
 
 
 import os
