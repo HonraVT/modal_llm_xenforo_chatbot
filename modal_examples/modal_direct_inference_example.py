@@ -1,17 +1,16 @@
-# first you need register on modal.com with your GitHub account.
-# steps:
-# Create a new virtual environment with python 3.11.
-# install modal lib (add modal to requirements.txt) with: pip install modal
-# Don't worry about errors in your IDE from imports inside functions, Modal will run the code in the cloud.
-# Configure modal (get token authorization file): python -m modal setup
-# create a huggingface token at https://huggingface.co/settings/tokens to not be blocked at download weights.
-# now set a new "secrets" on modal dashboard -> secrets tab
-# select "custom" add key: HUGGINGFACE_TOKEN value: "your huggingface token" and add a name: my-huggingface-secret
-# After run this file with: modal deploy modal_direct_inference_example.py
-# Wait modal internally installs and set "MODAL_APP_NAME" in src.secret.py file with your app name (line 67).
-# comment "modal_cli api client" from secrets file.
-# and change code in src.modal_cli.py with code in modal_cli.py from this folder.
-
+# First, register on modal.com using your GitHub account.
+# Steps:
+# 1. Create a new virtual environment with Python 3.11.
+# 2. Install the Modal library (add 'modal' to requirements.txt) with: `pip install modal`
+# 3. Don't worry about IDE errors from imports inside functions; Modal will run the code in the cloud.
+# 4. Configure Modal (get the token authorization file): `python -m modal setup`
+# 5. Create a Hugging Face token at https://huggingface.co/settings/tokens to avoid download weight blocks.
+# 6. Now, set a new "secrets" on the Modal dashboard in the "Secrets" tab.
+# 7. Select "custom" and add a key: HUGGINGFACE_TOKEN, value: "your Hugging Face token," and a name: my-huggingface-secret.
+# 8. Afterward, run this file with: `modal deploy modal_direct_inference_example.py`
+# 9. Wait for Modal to internally install and set "MODAL_APP_NAME" in src.secret.py file with your app name (line 67).
+# 10. Comment out "modal_cli api client" in the secrets file.
+# 11. Change the code in src.modal_cli.py with the code in modal_cli.py from this folder.
 
 import os
 
