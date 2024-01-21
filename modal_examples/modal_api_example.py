@@ -90,11 +90,12 @@ class Model:
         for index, output in enumerate(result):
             num_tokens += len(output.outputs[0].token_ids)
             res.append(
-                {"status": 0,
-                 "prompt": user_questions[index]["prompt"],
-                 "response": output.outputs[0].text,
-                 "tokens": num_tokens
-                 }
+                {
+                    "status": 0,
+                    "prompt": user_questions[index]["prompt"],
+                    "response": output.outputs[0].text,
+                    "tokens": num_tokens
+                }
             )
         return res
 
