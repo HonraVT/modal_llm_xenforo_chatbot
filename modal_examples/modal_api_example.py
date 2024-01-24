@@ -1,14 +1,17 @@
-# Register on modal.com with your GitHub account. Follow these steps:
-# 1. Create a new virtual environment with Python 3.11.
-# 2. Install the Modal library: `pip install modal`.
-# 3. Ignore IDE errors; Modal will execute the code in the cloud.
-# 4. Configure Modal and obtain the token authorization file: `python -m modal setup`.
-# 5. Generate a Hugging Face token at https://huggingface.co/settings/tokens to avoid download issues.
-# 6. On the Modal dashboard's "Secrets" tab, create a new secret named "my-huggingface-secret" with key: `HUGGINGFACE_TOKEN` and value: "your Hugging Face token."
-# 7. Create another secret named "bot-secrets" with key: `API_TOKEN` and value: "your random 16-character confidential password."
-# 8. Run the file using: `modal deploy modal_api_example.py`.
-# 9. Wait for Modal to install and get your URL endpoint printed on the console.
-# 10. Set this URL as "MODAL_URL" in the `src.secret.py` file.
+# first you need register on modal.com with your GitHub account.
+# steps:
+# Create a new virtual environment (separate from this project) with python 3.11.
+# install modal lib: pip install modal
+# Don't worry about errors in your IDE, the modal will run the code in the cloud.
+# Configure modal (get token authorization file): python -m modal setup
+# create a huggingface token at https://huggingface.co/settings/tokens to not be blocked at download weights.
+# now set a new "secrets" on modal dashboard -> secrets tab
+# select "custom" add key: HUGGINGFACE_TOKEN value: "your huggingface token" and add a name: my-huggingface-secret
+# create another secret on modal dashboard -> secrets tab:
+# select "custom" key: API_TOKEN value: "your random 16 length confidential password" and add a name: bot-secrets
+# After, run this file with: modal deploy modal_api_example.py
+# Wait modal internally installs and get your url endpoint printed on console :)
+# set this url in "MODAL_URL" in src.secret.py file.
 
 
 import os
@@ -36,12 +39,14 @@ def download_model_to_folder():
     move_cache()
 
 
-def format_prompts(prompts: list[dict]) -> list[str]:
+def format_prompts(bot_description: str, prompts: list[dict]) -> list[str]:
     result = []
     for item in prompts:
-        output = ("### System:\nYou are Vtlore a helpful AI assistant. You always answer briefly in a few words, "
-                  "at most two or three lines of text and never create long lists. You always respond in Brazilian "
-                  "Portuguese\n\n")
+        output = (
+            f"### System:\nYou are {bot_description}. You always answer briefly in a few words, "
+            "at most two or three lines of text and never create long lists. You always respond in Brazilian "
+            "Portuguese\n\n"
+        )
         for q, a in item["history"]:
             output += f"### User:\n{q}\n\n### Assistant:\n{a}\n\n"
         output += f"### User:\n{item['prompt']}\n\n### Assistant:"
@@ -73,10 +78,10 @@ class Model:
         self.llm = LLM(MODEL_DIR)
 
     @method()
-    def generate(self, user_questions: list[dict]) -> list[dict]:
+    def generate(self, bot_desc: str, user_questions: list[dict]) -> list[dict]:
         from vllm import SamplingParams
 
-        prompts = format_prompts(user_questions)
+        prompts = format_prompts(bot_desc, user_questions)
 
         sampling_params = SamplingParams(
             temperature=0.75,
@@ -90,22 +95,22 @@ class Model:
         for index, output in enumerate(result):
             num_tokens += len(output.outputs[0].token_ids)
             res.append(
-                {
-                    "status": 0,
-                    "prompt": user_questions[index]["prompt"],
-                    "response": output.outputs[0].text,
-                    "tokens": num_tokens
-                }
+                {"status": 0,
+                 "prompt": user_questions[index]["prompt"],
+                 "response": output.outputs[0].text,
+                 "tokens": num_tokens
+                 }
             )
         return res
 
 
 class Item(BaseModel):
     key: str
+    bot_description: str
     prompts: list
 
 
-@stub.function(secret=modal.Secret.from_name("bot-secrets"))
+@stub.function(secret=modal.Secret.from_name("vt-bot-secrets"))
 @web_endpoint(method="POST")
 def f(item: Item):
     if item.key != os.environ["API_TOKEN"]:
@@ -114,5 +119,5 @@ def f(item: Item):
             detail="Forbidden"
         )
     model = Model()
-    res = model.generate.remote(item.prompts)
+    res = model.generate.remote(item.bot_description, item.prompts)
     return res
