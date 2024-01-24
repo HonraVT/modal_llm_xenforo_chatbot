@@ -8,7 +8,7 @@ from src.utils import get_last_answered, is_newer_than_x_minutes, format_reply
 
 
 def first_run(production=True):
-    db = BotDB("bot_llm_db.json" if production else "test_db.json")
+    db = BotDB("bot_db.json" if production else "test_db.json")
     fs = ForumScraper(URL, COOKIE, production)
     alerts = fs.get_alerts()
     if alerts:
