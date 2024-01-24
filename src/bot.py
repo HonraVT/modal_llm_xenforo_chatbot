@@ -13,6 +13,7 @@ def first_run(production=True):
     alerts = fs.get_alerts()
     if alerts:
         db.set_last_mention(alerts[-1]["id"])
+    print("done!")
 
 
 def main(production=True):
