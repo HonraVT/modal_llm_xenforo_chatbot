@@ -12,6 +12,8 @@ URL = "https://7349b2b02ea4a424.demo-xenforo.com/2213"
 COOKIE = "2%2CZ2YTaDNgdfgHxW4HyEp201qgybE8PT6J_t39gfdgdfg"  # test
 #COOKIE = "96534721%2CZrn6AKwFdZTGc8gfdgdgdgDASDAsdfsdfsfsfsfs"  # mybotuser
 
+# modal bot description
+MODAL_BOT_DESCRIPTION = "XenBot a helpful AI assistant"
 
 # modal_cli api client
 MODAL_URL = "https://userxisto--example-vllm-inference-f.modal.run/"
