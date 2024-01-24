@@ -14,7 +14,7 @@ class ForumScraper:
         self.prod = prod
         self.payload = {}
         self.my_name = None
-        self.url = url
+        self.url = url.split('forums/')[0].rstrip("/")
         self.ses = requests.Session()
         self.ses.headers.update({"user-agent": USER_AGENT})
         self.ses.cookies.update({"xf_user" if prod else "2213_user": cookie})
@@ -28,13 +28,20 @@ class ForumScraper:
 
     def get_authorization(self):
         try:
-            res = self.ses.get(self.url)
+            res = self.ses.get(f"{self.url}/help")
             res.raise_for_status()
-            # print(res.text[30:550])
+            # print(res.text[0:1500])
             html = fromstring(res.content)
+            # print(lxml.html.tostring(html))
+            # is_logged = html.xpath('/html/@data-logged-in')
+            # if is_logged != "true":
+            #     raise NotLoggedInError(f"Error: not logged in!")
             self.payload['_xfToken'] = html.find('.//input[@name="_xfToken"]').value
-            self.my_name = html.xpath('//*[@id="top"]/div[1]/div[2]/nav/div/div[4]/div[1]/a[1]/span[2]/text()')[0] if (
-                self.prod) else html.xpath('/html/body/div[1]/div[1]/nav/div/div[3]/div[1]/a[1]/@title')[0]
+            u_name = html.xpath('//span[@class="avatar avatar--xxs"]/img/@alt')
+            if not u_name:
+                raise NotLoggedInError(
+                    f"Error: username xpath not found. please check your cookies and add an avatar to your profile.")
+            self.my_name = u_name[0]
         except (AttributeError, IndexError, requests.RequestException) as e:
             raise NotLoggedInError(f"message: not logged in! Error: {str(e)}")
 
