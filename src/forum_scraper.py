@@ -62,8 +62,8 @@ class ForumScraper:
         return post_ids
 
     def get_post(self, post_id: str) -> tuple[str, str, str, str, str, str]:
-        text_selector = 'div/div[2]/div/div/div/article/div[1]/div/node()[not(ancestor-or-self::blockquote)]'
-        quote_selector = './div/div[2]/div/div/div/article/div[1]/div/blockquote/div[2]/div[1]/node()'
+        text_selector = '//div[@class="bbWrapper"]/node()[not(ancestor-or-self::blockquote)]'
+        quote_selector = '//div[@class="bbWrapper"]/blockquote/div[2]/div[1]/node()'
         url = f"{self.url.split('/forums')[0]}/posts/{post_id}/show?_xfToken={self.payload['_xfToken']}&_xfResponseType=json"
         res = self.ses.get(url)
         res.raise_for_status()
