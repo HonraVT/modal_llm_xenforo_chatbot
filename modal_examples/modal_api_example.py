@@ -13,7 +13,6 @@
 
 import os
 
-import modal
 from fastapi import HTTPException, status
 from modal import Image, Secret, Stub, method, web_endpoint
 from pydantic import BaseModel
@@ -47,7 +46,7 @@ image = (
     .env({"HF_HUB_ENABLE_HF_TRANSFER": "1"})
     .run_function(
         download_model_to_folder,
-        secret=modal.Secret.from_name("my-huggingface-secret"),
+        secret=Secret.from_name("my-huggingface-secret"),
         timeout=60 * 20,
     )
 )
@@ -118,7 +117,7 @@ class Item(BaseModel):
     prompts: list
 
 
-@stub.function(timeout=60 * 10, secret=modal.Secret.from_name("vt-bot-secrets"))
+@stub.function(timeout=60 * 10, secret=Secret.from_name("vt-bot-secrets"))
 @web_endpoint(method="POST")
 def f(item: Item):
     if item.key != os.environ["API_TOKEN"]:
