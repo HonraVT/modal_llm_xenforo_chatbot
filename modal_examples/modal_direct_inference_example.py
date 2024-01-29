@@ -15,13 +15,13 @@
 
 import os
 
-import modal
-from fastapi import HTTPException, status
-from modal import Image, Secret, Stub, method, web_endpoint
-from pydantic import BaseModel
+from modal import Image, Secret, Stub, method
 
 MODEL_DIR = "/model"
-BASE_MODEL = "w4r10ck/SOLAR-10.7B-Instruct-v1.0-uncensored"
+
+# use quantitized model to fit on low cost T4 GPU
+BASE_MODEL = "TheBloke/SOLAR-10.7B-Instruct-v1.0-uncensored-AWQ"
+# BASE_MODEL = "w4r10ck/SOLAR-10.7B-Instruct-v1.0-uncensored"
 
 
 def download_model_to_folder():
@@ -38,21 +38,6 @@ def download_model_to_folder():
     move_cache()
 
 
-def format_prompts(bot_description: str, prompts: list[dict]) -> list[str]:
-    result = []
-    for item in prompts:
-        output = (
-            f"### System:\nYou are {bot_description}. You always answer briefly in a few words, "
-            "at most two or three lines of text and never create long lists. You always respond in Brazilian "
-            "Portuguese\n\n"
-        )
-        for q, a in item["history"]:
-            output += f"### User:\n{q}\n\n### Assistant:\n{a}\n\n"
-        output += f"### User:\n{item['prompt']}\n\n### Assistant:"
-        result.append(output)
-    return result
-
-
 image = (
     Image.from_registry(
         "nvidia/cuda:12.1.0-base-ubuntu22.04", add_python="3.10"
@@ -61,7 +46,7 @@ image = (
     .env({"HF_HUB_ENABLE_HF_TRANSFER": "1"})
     .run_function(
         download_model_to_folder,
-        secret=modal.Secret.from_name("my-huggingface-secret"),
+        secret=Secret.from_name("my-huggingface-secret"),
         timeout=60 * 20,
     )
 )
@@ -69,7 +54,29 @@ image = (
 stub = Stub("example-vllm-inference", image=image)
 
 
-@stub.cls(gpu="A100", secret=Secret.from_name("my-huggingface-secret"))
+def format_prompts(bot_description: str, prompts: list[dict]) -> list[str]:
+    result = []
+    for item in prompts:
+        output = (
+            f"### System:\nYou are {bot_description}. You always answer briefly in a few words, "
+            "at most two or three lines of text and never create long lists. You always respond in coherent and "
+            "syntactically correct Brazilian Portuguese\n\n"
+        )
+        h = item.get("history")
+        if h:
+            for q, a in h:
+                output += f"### User:\n{q}\n\n### Assistant:\n{a}\n\n"
+        output += f"### User:\n{item['prompt']}\n\n### Assistant:"
+        result.append(output)
+    return result
+
+
+@stub.cls(
+    gpu="T4",
+    timeout=60 * 10,
+    container_idle_timeout=60 * 10,
+    secret=Secret.from_name("my-huggingface-secret")
+)
 class Model:
     def __enter__(self):
         from vllm import LLM
@@ -94,10 +101,11 @@ class Model:
         for index, output in enumerate(result):
             num_tokens += len(output.outputs[0].token_ids)
             res.append(
-                {"status": 0,
-                 "prompt": user_questions[index]["prompt"],
-                 "response": output.outputs[0].text,
-                 "tokens": num_tokens
-                 }
+                {
+                    "status": 0,
+                    "prompt": user_questions[index]["prompt"],
+                    "response": output.outputs[0].text,
+                    "tokens": num_tokens
+                }
             )
         return res
