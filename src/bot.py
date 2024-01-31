@@ -1,7 +1,7 @@
 from time import sleep
 
 from src.db_handler import BotDB
-from src.forum_scraper import ForumScraper
+from src.forum_scraper import ForumScraper, PostNotFoundError
 from src.modal_cli import receive_data
 from src.secret import URL, COOKIE, LOGGING_ENABLED, MAX_HISTORY
 from src.utils import get_last_answered, is_newer_than_x_minutes, format_reply
@@ -29,7 +29,10 @@ def main(production=True):
 
         for alert in new_alerts:
             alert_type, alert_id = alert.values()
-            author, author_name, timestamp, thread, quote, text = fs.get_post(alert_id)
+            try:
+                author, author_name, timestamp, thread, quote, text = fs.get_post(alert_id)
+            except PostNotFoundError:
+                continue
             text = text.replace(f"@{bot_name}", "").strip()
             quote = quote.replace(f"@{bot_name}", "").strip()
 
@@ -66,7 +69,8 @@ def main(production=True):
                 # print(thread, format_reply(author_name, alert_id, author, text, response[1]))
 
             db.set_last_mention(alert_id)
-            sleep(20)
+            sleep(5)
 
     except Exception:
         raise
+        
