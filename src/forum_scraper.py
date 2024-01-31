@@ -8,6 +8,10 @@ class NotLoggedInError(Exception):
     """Raised when user is not logged"""
     pass
 
+class PostNotFoundError(Exception):
+    """Raised when get_posts return 404 error"""
+    pass
+
 
 class ForumScraper:
     def __init__(self, url: str, cookie: str, prod: bool = True):
@@ -73,6 +77,8 @@ class ForumScraper:
         quote_selector = '//div[@class="bbWrapper"]/blockquote/div[2]/div[1]/node()[not(ancestor-or-self::script)][not(ancestor-or-self::form)]'
         url = f"{self.url.split('/forums')[0]}/posts/{post_id}/show?_xfToken={self.payload['_xfToken']}&_xfResponseType=json"
         res = self.ses.get(url)
+        if res.status_code == 404:
+            raise PostNotFoundError("Error: 404")
         res.raise_for_status()
         tree = fromstring(res.json()["html"]["content"])
         article = tree.xpath('div/div/article[1]')[0]
@@ -87,3 +93,4 @@ class ForumScraper:
         ).strip()
         text = ''.join([ele if isinstance(ele, str) else ele.text_content() for ele in article.xpath(text_selector)])
         return author_id, author_name, timestamp, thread, quote, text
+        
