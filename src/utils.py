@@ -1,11 +1,8 @@
 from datetime import datetime, timedelta
 
 
-def get_last_answered(last_answered: str, list_of_posts: list) -> list:
-    item_index = next((i for i, d in enumerate(list_of_posts) if d["id"] == last_answered), None)
-    if item_index is None:
-        return list_of_posts
-    return list_of_posts[item_index + 1:]
+def get_last_answered(post_id: str, data: list[dict[str, str]]) -> list[dict[str, str]]:
+    return sorted([item for item in data if int(item['post_id']) > int(post_id)], key=lambda x: int(x['post_id']))
 
 
 def is_newer_than_x_minutes(timestamp: str, minutes=10) -> bool:
